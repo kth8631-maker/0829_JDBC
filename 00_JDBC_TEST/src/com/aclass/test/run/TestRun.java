@@ -48,7 +48,7 @@ public class TestRun {
 		String name = sc.nextLine();
 		
 		// 실행할 SQL문(완성된 형태로 만들어주기)
-		String sql = "INSERT INTO TB_STUDENT CALUES(1, '홍길동', SYSDATE)";
+		String sql = "INSERT INTO TB_STUDENT VALUES(1, '홍길동', SYSDATE)";
 		sql = "INSERT INTO TB_STUDENT VALUES(" + num + ", '" + name + "', SYSDATE)"; 
 		
 		try {
