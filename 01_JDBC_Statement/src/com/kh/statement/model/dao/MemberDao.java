@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kh.statement.model.dto.PasswordDTO;
 import com.kh.statement.model.vo.Member;
 
 public class MemberDao {
@@ -450,5 +451,119 @@ public class MemberDao {
 		
 	}
 	
+	public int update(PasswordDTO pd) {
+		// UPDATE -> 처리된 행의 개수(int)
+		// -> 트랜잭션처리
+		
+		// 0) 필요한 변수들 세팅
+		Connection conn = null; // DB랑 연결
+		Statement stmt = null; // SQL문 실행
+		int result = 0; // 결과 담을 변수 정수형
+		
+		String sql = "UPDATE "
+				          + "MEMBER "
+				      + "SET "
+				          + "USERPWD = '" + pd.getNewPassword() + "' "
+				    + "WHERE "
+				          + "USERNO = (SELECT "
+				          		           + "USERNO "
+				        		      + "FROM "
+				          		           + "MEMBER "
+				        		     + "WHERE "
+				          		           + "USERID = '" + pd.getUserId() + "' "
+				          		       + "AND "
+				          		           + "USERPWD = '" + pd.getUserPwd() + "')";
+		
+		try {
+			// 1) JDBC Driver등록
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			
+			// 2) Connection 만들기
+			conn = DriverManager
+					.getConnection("jdbc:oracle:thin:@115.90.212.20:10000:XE"
+								  ,"KTH04"
+								  ,"KTH041234");
+			
+			// 2_2) AutoCommit 끠
+			conn.setAutoCommit(false);
+			
+			// 3) Statement 만들기
+			stmt = conn.createStatement();
+			
+			// 4, 5) SQL문(UPDATE) 실행 후 결과 받기
+			result = stmt.executeUpdate(sql);
+			
+			// 6) 트랜잭션 처리
+			if(result > 0) {
+				conn.commit();
+			}
+			
+			
+		} catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 7) 사용이 끝난 JDBC용 객체 반납 => 생성된 순서의 역순으로 (close())
+			try {
+				if(stmt != null) {
+					stmt.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if(conn != null) {
+					conn.close();
+				}
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		//8) 뷰로 결과 반환
+		return result;
+		
+	}
+	
+	public int delete(Member member) {
+		// 0)
+		int result = 0;
+		Connection conn = null;
+		Statement stmt = null;
+		
+		String sql = "DELETE "
+				     + "FROM "
+				           + "MEMBER "
+				    + "WHERE "
+				           + "USERID = '" + member.getUserId() + "' "
+				       +"AND "
+				           + "USERPWD = '" + member.getUserPwd() + "'";
+		// 1 ~ 6)
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@115.90.212.20:10000:XE"
+											  ,"KTH04"
+											  ,"KTH041234");
+			conn.setAutoCommit(false);
+			stmt = conn.createStatement();
+			result = stmt.executeUpdate(sql);
+			if(result > 0) { conn.commit(); }
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try { //7
+				stmt.close();
+				conn.close();
+			} catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	     return result;
+		
+		
+		
+	}
 
+	
+	
 }
