@@ -171,7 +171,77 @@ public class DessertDao {
 		return desserts;
 	}
 	
-	
+	public Dessert findById(String dessertName) {
+		Dessert dessert = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		
+		String sql = """
+			           SELECT
+	                          DESSERTNO
+	                        , DESSERTNAME
+	                        , CATEGORY
+	                        , INGREDIENT
+	                        , CALORIES
+	                        , ENROLLDATE
+	                     FROM
+	                          MEMBER
+	                    WHERE
+	                          DESSERTNAME = ?
+	               	""";
+		
+		try {
+			Class.forName(DRIVER);
+			
+			conn = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, dessertName);
+			
+			rset = pstmt.executeQuery();
+			
+			if(rset.next()) {
+				
+				dessert = new Dessert(rset.getInt("DESSERTNO")
+									 ,rset.getString("DESSERTNAME")
+									 ,rset.getString("CATEGORY")
+									 ,rset.getString("INGREDIENT")
+									 ,rset.getString("CALORIES")
+									 ,rset.getDate("ENROLLDATE"));
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rset != null) {
+					rset.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if(pstmt != null) {
+					pstmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if(conn != null) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return dessert;
+	}
 	
 	
 	
