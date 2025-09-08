@@ -2,6 +2,7 @@ package com.kh.statement.model.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,31 @@ public class DessertDao {
 							
 				
 					""";
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()) {
+				Dessert dessert = new Dessert(rset.getInt("DESSERTNO")
+											 ,rset.getString("DESSERTNAME")
+											 ,rset.getString("CATEGORY")
+											 ,rset.getString("INGREDIENT")
+											 ,rset.getString("CALORIES")
+											 ,rset.getDate("ENROLLDATE"));
+				desserts.add(dessert);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			JDBCTemplate.close(rset);
+			JDBCTemplate.close(pstmt);
+		}
+		return desserts;
+		
+	}
+	
+	public Dessert findById(Connection conn, String dessertName) {
 		
 		
 	}

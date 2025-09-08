@@ -43,5 +43,14 @@ public class DessertService {
 		return desserts;
 		
 	}
+	
+	public Dessert findById(String dessertName) {
+		
+		Dessert dessert = new DessertDao().findById(conn, dessertName);
+		
+		close(conn);
+		
+		return dessert;
+	}
 
 }
